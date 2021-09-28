@@ -1,2 +1,2 @@
-# webprotege-download-generator-service
-A service that generates downloads for WebProtege projects
+# webprotege-snapshot-generator-service
+A service that generates snapshots of ontology in WebProtege projects for download or downstream processing
