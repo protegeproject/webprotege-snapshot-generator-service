@@ -9,9 +9,7 @@ import edu.stanford.protege.webprotege.revision.RevisionManager;
 import edu.stanford.protege.webprotege.revision.RevisionManagerFactory;
 import edu.stanford.protege.webprotege.revision.RevisionNumber;
 import edu.stanford.protege.webprotege.common.UserId;
-import io.minio.MinioClient;
-import io.minio.StatObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +112,9 @@ class CreateSnapshotTask implements Supplier<SnapshotStorageCoordinates> {
             logger.info("{} {} Finished creating snapshot ({} MB)", projectId, userId, String.format("%.4f", sizeInMB));
             logger.info("{} {} Storing snapshot at {}", projectId, userId, minio.getLocation());
 
+
+            createBucketIfNotExists();
+
             var uploadObjectArgs = UploadObjectArgs.builder()
                                                    .bucket(BUCKET_NAME)
                                                    .object(minio.getLocation())
@@ -128,7 +129,16 @@ class CreateSnapshotTask implements Supplier<SnapshotStorageCoordinates> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (MinioException | NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.error("MinIO Error", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void createBucketIfNotExists() throws ErrorResponseException, InsufficientDataException, InternalException, InvalidKeyException, InvalidResponseException, IOException, NoSuchAlgorithmException, ServerException, XmlParserException {
+        if(!minioClient.bucketExists(BucketExistsArgs.builder()
+                                         .bucket(BUCKET_NAME)
+                                                 .build())) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET_NAME).build());
         }
     }
 
@@ -144,7 +154,7 @@ class CreateSnapshotTask implements Supplier<SnapshotStorageCoordinates> {
                 }
             }
             return Optional.empty();
-        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException | InvalidResponseException | ServerException | IOException | NoSuchAlgorithmException | XmlParserException e) {
+        } catch (Exception e) {
             logger.error("An error occurred", e);
             return Optional.empty();
         }
