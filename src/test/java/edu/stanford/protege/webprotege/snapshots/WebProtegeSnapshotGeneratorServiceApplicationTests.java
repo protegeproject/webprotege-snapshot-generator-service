@@ -1,4 +1,4 @@
-package edu.stanford.protege.webprotege.download;
+package edu.stanford.protege.webprotege.snapshots;
 
 import io.minio.MinioClient;
 import org.junit.jupiter.api.Test;
