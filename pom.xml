@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>edu.stanford.protege</groupId>
 	<artifactId>webprotege-snapshot-generator-service</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<name>webprotege-snapshot-generator-service</name>
 	<description>A service that generates snapshots of ontologies in projects</description>
 	<properties>
