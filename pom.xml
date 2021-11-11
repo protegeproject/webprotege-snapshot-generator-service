@@ -10,12 +10,20 @@
 	</parent>
 	<groupId>edu.stanford.protege</groupId>
 	<artifactId>webprotege-snapshot-generator-service</artifactId>
-	<version>6.0.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>webprotege-snapshot-generator-service</name>
 	<description>A service that generates snapshots of ontologies in projects</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -24,22 +32,22 @@
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>webprotege-common</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>webprotege-ipc</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>webprotege-backend-api</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
 			<artifactId>webprotege-revision-manager</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.minio</groupId>
@@ -63,16 +71,85 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.2.0</version>
+						<configuration>
+							<doclint>none</doclint>
+							<release>16</release>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.7</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+						<dependencies>
+							<!--
+                              TODO:
+                                Remove after OSSRH-66257, NEXUS-26993 are fixed,
+                                possibly via https://github.com/sonatype/nexus-maven-plugins/pull/91
+                            -->
+							<dependency>
+								<groupId>com.thoughtworks.xstream</groupId>
+								<artifactId>xstream</artifactId>
+								<version>1.4.15</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
