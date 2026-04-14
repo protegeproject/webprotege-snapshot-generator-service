@@ -75,7 +75,7 @@ public class SnapshotSerializer {
                               @Nonnull RevisionNumber revision,
                               @Nonnull DocumentFormat format,
                               @Nonnull RevisionManager revisionManager,
-                              @Nonnull GetProjectPrefixDeclarationsExecutor prefixDeclarationsExecutor) {
+                              @Nonnull CommandExecutor<GetProjectPrefixDeclarationsRequest, GetProjectPrefixDeclarationsResponse> prefixDeclarationsExecutor) {
         this.projectId = checkNotNull(projectId);
         this.revision = checkNotNull(revision);
         this.revisionManager = checkNotNull(revisionManager);
