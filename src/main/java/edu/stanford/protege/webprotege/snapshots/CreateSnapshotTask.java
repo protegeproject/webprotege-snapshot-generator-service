@@ -154,8 +154,18 @@ class CreateSnapshotTask implements Supplier<SnapshotStorageCoordinates> {
                 }
             }
             return Optional.empty();
+        } catch (ErrorResponseException e) {
+            var code = e.errorResponse().code();
+            if("NoSuchKey".equals(code) || "NoSuchBucket".equals(code)) {
+                // Expected cache miss: the snapshot has not been created before
+                logger.info("{} {} No existing snapshot for revision {}", projectId, userId, revisionNumber.getValue());
+            }
+            else {
+                logger.error("{} {} An error occurred while checking for an existing snapshot", projectId, userId, e);
+            }
+            return Optional.empty();
         } catch (Exception e) {
-            logger.error("An error occurred", e);
+            logger.error("{} {} An error occurred while checking for an existing snapshot", projectId, userId, e);
             return Optional.empty();
         }
     }
