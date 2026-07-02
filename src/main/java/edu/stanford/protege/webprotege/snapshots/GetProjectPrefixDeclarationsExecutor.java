@@ -1,17 +1,21 @@
 package edu.stanford.protege.webprotege.snapshots;
 
 import edu.stanford.protege.webprotege.ipc.CommandExecutor;
+import edu.stanford.protege.webprotege.ipc.impl.CommandExecutorImpl;
 import edu.stanford.protege.webprotege.project.GetProjectPrefixDeclarationsRequest;
 import edu.stanford.protege.webprotege.project.GetProjectPrefixDeclarationsResponse;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Matthew Horridge
- * Stanford Center for Biomedical Informatics Research
- * 2021-09-24
+ * Configuration that provides a CommandExecutor bean for getting project
+ * prefix declarations from the backend service via RabbitMQ.
  */
-public class GetProjectPrefixDeclarationsExecutor extends CommandExecutor<GetProjectPrefixDeclarationsRequest, GetProjectPrefixDeclarationsResponse> {
+@Configuration
+public class GetProjectPrefixDeclarationsExecutor {
 
-    public GetProjectPrefixDeclarationsExecutor() {
-        super(GetProjectPrefixDeclarationsResponse.class);
+    @Bean
+    public CommandExecutor<GetProjectPrefixDeclarationsRequest, GetProjectPrefixDeclarationsResponse> prefixDeclarationsExecutor() {
+        return new CommandExecutorImpl<>(GetProjectPrefixDeclarationsResponse.class);
     }
 }

@@ -1,11 +1,17 @@
 package edu.stanford.protege.webprotege.snapshots;
 
-import edu.stanford.protege.webprotege.ipc.CommandHandler;
+import edu.stanford.protege.webprotege.authorization.BasicCapability;
+import edu.stanford.protege.webprotege.authorization.Capability;
+import edu.stanford.protege.webprotege.authorization.ProjectResource;
+import edu.stanford.protege.webprotege.authorization.Resource;
+import edu.stanford.protege.webprotege.ipc.AuthorizedCommandHandler;
 import edu.stanford.protege.webprotege.ipc.ExecutionContext;
 import edu.stanford.protege.webprotege.ipc.WebProtegeHandler;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -15,7 +21,9 @@ import java.util.concurrent.ExecutorService;
  * 2021-09-23
  */
 @WebProtegeHandler
-public class CreateSnapshotCommandHandler implements CommandHandler<CreateSnapshotRequest, CreateSnapshotResponse> {
+public class CreateSnapshotCommandHandler implements AuthorizedCommandHandler<CreateSnapshotRequest, CreateSnapshotResponse> {
+
+    private static final Capability DOWNLOAD_PROJECT = new BasicCapability("DownloadProject");
 
 
     @Nonnull
@@ -39,6 +47,18 @@ public class CreateSnapshotCommandHandler implements CommandHandler<CreateSnapsh
     @Override
     public Class<CreateSnapshotRequest> getRequestClass() {
         return CreateSnapshotRequest.class;
+    }
+
+    @Nonnull
+    @Override
+    public Resource getTargetResource(CreateSnapshotRequest request) {
+        return ProjectResource.forProject(request.projectId());
+    }
+
+    @Nonnull
+    @Override
+    public Collection<Capability> getRequiredCapabilities() {
+        return Set.of(DOWNLOAD_PROJECT);
     }
 
     @Override

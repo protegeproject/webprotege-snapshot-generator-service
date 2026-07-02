@@ -1,9 +1,12 @@
 package edu.stanford.protege.webprotege.snapshots;
 
-import edu.stanford.protege.webprotege.WebprotegeBackendApi;
+import edu.stanford.protege.webprotege.project.WebprotegeProjectManagementApiApplication;
 import edu.stanford.protege.webprotege.common.WebProtegeCommonConfiguration;
+import edu.stanford.protege.webprotege.ipc.CommandExecutor;
 import edu.stanford.protege.webprotege.ipc.WebProtegeIpcApplication;
 import edu.stanford.protege.webprotege.jackson.WebProtegeJacksonApplication;
+import edu.stanford.protege.webprotege.project.GetProjectPrefixDeclarationsRequest;
+import edu.stanford.protege.webprotege.project.GetProjectPrefixDeclarationsResponse;
 import edu.stanford.protege.webprotege.revision.RevisionManagerFactory;
 import edu.stanford.protege.webprotege.revision.WebProtegeRevisionManagerApplication;
 import io.minio.MinioClient;
@@ -18,7 +21,7 @@ import java.util.concurrent.Executors;
 
 @SpringBootApplication
 @EnableConfigurationProperties
-@Import({WebProtegeRevisionManagerApplication.class, WebProtegeJacksonApplication.class, WebprotegeBackendApi.class, WebProtegeIpcApplication.class, WebProtegeCommonConfiguration.class})
+@Import({WebProtegeRevisionManagerApplication.class, WebProtegeJacksonApplication.class, WebprotegeProjectManagementApiApplication.class, WebProtegeIpcApplication.class, WebProtegeCommonConfiguration.class})
 public class WebProtegeSnapshotGeneratorServiceApplication {
 
     public static void main(String[] args) {
@@ -26,13 +29,9 @@ public class WebProtegeSnapshotGeneratorServiceApplication {
     }
 
     @Bean
-    SnapshotSerializerFactory projectDownloaderFactory(GetProjectPrefixDeclarationsExecutor p1) {
-        return new SnapshotSerializerFactory(p1);
-    }
-
-    @Bean
-    GetProjectPrefixDeclarationsExecutor getProjectPrefixes() {
-        return new GetProjectPrefixDeclarationsExecutor();
+    SnapshotSerializerFactory projectDownloaderFactory(
+            CommandExecutor<GetProjectPrefixDeclarationsRequest, GetProjectPrefixDeclarationsResponse> prefixDeclarationsExecutor) {
+        return new SnapshotSerializerFactory(prefixDeclarationsExecutor);
     }
 
     @Bean
