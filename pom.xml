@@ -68,6 +68,49 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>docker-build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>docker</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+							<arguments>
+								<argument>build</argument>
+								<argument>-f</argument>
+								<argument>Dockerfile</argument>
+								<argument>--build-arg</argument>
+								<argument>JAR_FILE=${project.artifactId}-${project.version}.jar</argument>
+								<argument>-t</argument>
+								<argument>protegeproject/${project.artifactId}:${project.version}</argument>
+								<argument>.</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>docker-push</id>
+						<phase>install</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>docker</executable>
+							<workingDirectory>${project.basedir}</workingDirectory>
+							<arguments>
+								<argument>push</argument>
+								<argument>protegeproject/${project.artifactId}:${project.version}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
