@@ -9,6 +9,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # The Spring context connects to RabbitMQ on startup, so the
+    # context-loads test needs a live broker.
+    services:
+      rabbitmq:
+        image: rabbitmq:4.1.1
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
         with:
